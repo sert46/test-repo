@@ -1,0 +1,32 @@
+name: Auto Commit (Random Time)
+
+on:
+  schedule:
+    # Jalankan 4 kali sehari di waktu acak
+    - cron: '0 6,12,18,23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup timezone to Asia/Jakarta
+        run: sudo timedatectl set-timezone Asia/Jakarta
+
+      - name: Random sleep (biar gak fix jamnya)
+        run: sleep $((RANDOM % 3600))  # delay acak max 1 jam
+
+      - name: Auto Commit
+        run: |
+          git config user.name "sert46"
+          git config user.email "110098909+sert46@users.noreply.github.com"
+          echo "$(date)" >> activity.log
+          git add activity.log
+          git commit -m "Auto commit $(date)" || echo "No changes to commit"
+          git push
